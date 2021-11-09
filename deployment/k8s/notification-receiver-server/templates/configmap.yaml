@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: configmap-{{ include "notification-receiver-service.name" . }}
+  namespace: {{ .Values.namespace }}
+data:
+  appsettings.json: |
+    {
+      "Logging": {
+        "LogLevel": {
+          "Default": "Information",
+          "Microsoft": "Warning",
+          "Microsoft.Hosting.Lifetime": "Information"
+        },
+        "TgsLog": {
+          "LogLevel": {
+            "Default": "None",
+            "Microsoft": "Warning",
+            "Microsoft.Hosting.Lifetime": "None",
+            "TGS": "Information"
+          }
+        }
+      },
+      "Telegram": {
+        "API": "{{ .Values.telegram.api }}",
+        "BotToken": "{{ .Values.telegram.botToken }}",
+        "Channel": "{{ .Values.telegram.channel }}"
+      },
+      "RabbitMQ": {
+        "RabbitMQUrl": "{{ .Values.rabbit.url }}",
+        "UserName": "{{ .Values.rabbit.user }}",
+        "Password": "{{ .Values.rabbit.password }}",
+        "VirtualHost": "{{ .Values.rabbit.vhost  }}"
+      },
+      "AllowedHosts": "*"
+    }

@@ -7,7 +7,7 @@
     <GlobalNugetConfig>$(UserProfile)\AppData\Roaming\NuGet\NuGet.Config</GlobalNugetConfig>
     <GlobalNugetConfig Condition="'$(UserProfile)'==''">$(HOME)/.nuget/NuGet/NuGet.Config</GlobalNugetConfig>
     <DockerfileBuildArguments>--build-arg "BuildConfiguration=$(Configuration)" --secret id=nuget,src="$(GlobalNugetConfig)"</DockerfileBuildArguments>
-    <DockerfileTag Condition="$(DockerfileTag) == ''">game/kickPlayerreceiverserver</DockerfileTag>
+    <DockerfileTag Condition="$(DockerfileTag) == ''">notification-receiver-service</DockerfileTag>
 
   </PropertyGroup>
 
