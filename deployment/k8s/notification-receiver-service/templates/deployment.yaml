@@ -1,0 +1,87 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "notification-receiver-service.fullname" . }}
+  labels:
+    {{- include "notification-receiver-service.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "notification-receiver-service.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "notification-receiver-service.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /config/appsettings.json
+              name: appsettings
+              readOnly: true
+              subPath: appsettings.json
+            {{- if eq .Values.namespace "prod" }}
+            - mountPath: /etc/ssl/certs/rds-combined-ca-bundle.pem
+              name: rds-combined-ca-bundle
+              readOnly: true
+              subPath: rds-combined-ca-bundle.pem
+            {{- end }}
+
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+        - name: appsettings
+          configMap:
+            name: configmap-{{ include "notification-receiver-service.fullname" . }}
+        {{- if eq .Values.namespace "prod" }}
+        - name: rds-combined-ca-bundle
+          configMap:
+            name: configmap-mongodb-pem
+        {{- end }}
+      {{ if eq .Values.namespace "staging" }}
+      nodeSelector:
+        dedicated: nonprod
+      tolerations:
+      - effect: NoSchedule
+        key: dedicated
+        operator: Equal
+        value: nonprod
+      {{ end }}
+      {{ if eq .Values.namespace "prod" }}
+      nodeSelector:
+        dedicated: prod
+      tolerations:
+      - effect: NoSchedule
+        key: dedicated
+        operator: Equal
+        value: prod
+      {{ end }}

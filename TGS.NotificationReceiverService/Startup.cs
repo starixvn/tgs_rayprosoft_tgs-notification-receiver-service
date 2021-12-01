@@ -41,7 +41,7 @@ namespace TGS.NotificationReceiverService
                     c.IncludeXmlComments(xmlFileName);
                 }
 
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "NotifyService", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "TGS.NotificationReceiverService", Version = "v1" });
             });
 
             services.AddHttpClient();
@@ -85,7 +85,8 @@ namespace TGS.NotificationReceiverService
             {
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "NotifyService v1"));
+                app.UseSwaggerUI(c
+                    => c.SwaggerEndpoint("/swagger/v1/swagger.json", "TGS.NotificationReceiverService v1"));
             }
 
             app.UseHttpsRedirection();
