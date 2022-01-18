@@ -35,8 +35,7 @@ namespace TGS.NotificationReceiverService.ReceiveHandlers
                 var model = new
                 {
                     chat_id = _settings.Channel,
-                    text =
-                        $"<b><i>{request.Message}</i></b></br><b><i>{request.StackTrace}</i></b></br><b><i>{request.InnerMessage}</i></b>",
+                    text = $"<b><i>{request.Message}</i></b>",
                     parse_mode = "HTML"
                 };
 
