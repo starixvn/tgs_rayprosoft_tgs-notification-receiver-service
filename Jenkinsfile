@@ -104,7 +104,7 @@ pipeline {
                         println resources
 
                         withCredentials([string(credentialsId: "tgs-${kube_ns}-connectionstring", variable: "tgs_tgs")]) {
-                            sh '''
+                            sh """
                                  cat << EOF | yq e -P | helm template deployment/k8s/notification-receiver-service \
                                     --set image.tag=${TAG} \
                                     --set namespace=${kube_ns} \
@@ -122,8 +122,8 @@ pipeline {
                                     "tolerations": [$dedicated],
                                     "resources": $resources
                                 }
-                            '''
-                            sh '''
+                            """
+                            sh """
                                  cat << EOF | yq e -P | helm template deployment/k8s/notification-receiver-service \
                                     --set image.tag=${TAG} \
                                     --set namespace=${kube_ns} \
@@ -142,7 +142,7 @@ pipeline {
                                     "tolerations": [$dedicated],
                                     "resources": $resources
                                 }
-                            '''
+                            """
                         }
                     }
                 }
