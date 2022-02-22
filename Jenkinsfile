@@ -20,20 +20,14 @@ pipeline {
                         case ['origin/main','main']:
                             env.kube_ns = "prod";
                             env.k8s_config = 'stag-k8s-config';
-                            env.node_selector = '{ "dedicated": "prod" }';
-                            env.dedicated = '{"effect":"NoSchedule","key": "dedicated", "operator": "Equal", "value": "prod"}';
                             break;
                         case ['origin/release','release']:
                             env.kube_ns = "staging";
                             env.k8s_config = 'stag-k8s-config';
-                            env.node_selector = '{ "dedicated": "nonprod" }';
-                            env.dedicated = '{"effect":"NoSchedule","key": "dedicated", "operator": "Equal", "value": "nonprod"}';
                             break;
                         default:
                             env.kube_ns = "dev";
                             env.k8s_config = 'k8s-kube-config';
-                            env.node_selector = '{}';
-                            env.dedicated = ''; 
                             break;
                     }
                 }
@@ -101,6 +95,8 @@ pipeline {
                 script {
                     withKubeConfig([credentialsId: env.k8s_config]) {
                         def resources = getResources(env.k8s_config, env.kube_ns, "notification-receiver-service")
+                        def dedicated = getTgsSettings(env.k8s_config, env.kube_ns, "dedicated")
+                        def node_selector = getTgsSettings(env.k8s_config, env.kube_ns, "node-selector")
                         println resources
 
                         withCredentials([string(credentialsId: "tgs-${kube_ns}-connectionstring", variable: "tgs_tgs")]) {
